@@ -1,0 +1,14 @@
+# Build output
+cmake-build-*/
+build/
+
+# IDE
+.idea/
+.vscode/
+
+# Compiled artifacts
+*.o
+*.obj
+*.a
+*.so
+*.exe
