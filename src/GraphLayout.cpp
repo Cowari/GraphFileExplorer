@@ -26,10 +26,20 @@ void GraphLayout::AddChildInOrbit(const size_t parentIndex, const float radius, 
     newNode.SetParent(parentIndex);
 }
 
+std::optional<size_t> GraphLayout::GetNodeIndexAtPosition(Position posXY) const{
+    for (size_t i = allNodes.size(); i > 0; --i) {
+        size_t idx = i - 1;
+        if (allNodes[idx].IsCursorInside(posXY, allNodes[idx].GetRadius())) {
+            return idx;
+        }
+    }
+    return std::nullopt;
+}
+
 void GraphLayout::PrintAllNodes() const {
     for (auto& node : allNodes) {
         auto [x, y] = node.GetPosition();
-        std::cout << node.GetPath() << ":\n\t x: " << x << "\ty: " << y << "\n\t Parent: " << node.GetParentIndex() << std::endl;
+        std::cout << node.GetPath() << ":\n\t x: " << x << "\ty: " << y << "\n\t Parent: " << node.GetParentIndex().value_or(0) << std::endl;
     }
 }
 

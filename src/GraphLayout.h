@@ -11,6 +11,7 @@ class GraphLayout {
     void AddChildInOrbit(size_t parentIndex, float radius, float angleDeg, bool isDir, std::string nodeName);
 
     [[nodiscard]] const std::vector<Node>& GetNodes() const;
+    [[nodiscard]] std::optional<size_t> GetNodeIndexAtPosition(Position posXY) const;
     void PrintAllNodes() const; // for debug
 
     private:

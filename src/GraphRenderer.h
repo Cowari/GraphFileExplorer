@@ -5,7 +5,7 @@
 
 class GraphRenderer {
 public:
-    void Render(const GraphLayout& layout);
+    void Render(const GraphLayout& layout) const;
 private:
     // TODO:
     // void drawConnection(Node1, Node2) - нарисует линию от одной ноды к другой

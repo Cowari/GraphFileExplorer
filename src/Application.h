@@ -9,13 +9,16 @@ class Application {
     Application(int width, int height, const char* title);
     ~Application();
 
-    bool InitGLFW(int width, int height, const char *title);
-    void InitImGui() const;
-    void Shutdown() const;
     // Infinite Loop
     void Run();
 
     private:
+    bool InitGLFW(int width, int height, const char *title);
+    void InitImGui() const;
+    void Shutdown() const;
+
+    void HandleInput() const;
+
     GLFWwindow* window = nullptr;
 
     GraphLayout graphLayout;

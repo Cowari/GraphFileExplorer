@@ -20,7 +20,7 @@ graphLayout(Position{500.f, 500.f})
     graphLayout.AddChildInOrbit(0, 60.f, -90.f, false, "text.txt");
     graphLayout.AddChildInOrbit(0, 60.f, -10.f, true, "test_dir");
     graphLayout.AddChildInOrbit(2, 60.f, -40.f, false, "test_file");
-    // graphLayout.PrintAllNodes();
+    graphLayout.PrintAllNodes();
 }
 
 Application::~Application() {
@@ -70,6 +70,20 @@ void Application::Shutdown() const {
     glfwTerminate();
 }
 
+void Application::HandleInput() const {
+    const ImVec2 mousePos = ImGui::GetMousePos();
+
+    if (ImGui::IsMouseClicked(0)) {
+        if ( std::optional<size_t> clickedIndex = graphLayout.GetNodeIndexAtPosition({mousePos.x, mousePos.y}) ) {
+            const auto& clickedNode = graphLayout.GetNodes()[*clickedIndex];
+            std::cout << "click on " << clickedNode.GetPath() << std::endl;
+        }
+        else {
+            std::cout << "click on empty space" << std::endl;
+        }
+    }
+}
+
 void Application::Run() {
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -79,6 +93,7 @@ void Application::Run() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        HandleInput();
         // graph rendering
         graphRenderer.Render(graphLayout);
 

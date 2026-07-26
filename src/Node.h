@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include <string>
 #include <utility>
 
@@ -13,14 +14,17 @@ public:
 
     void SetParent(size_t index);
 
+    [[nodiscard]] bool IsCursorInside(Position cursorPosition, float radius) const;
     [[nodiscard]] Position GetPosition() const;
+    [[nodiscard]] float GetRadius() const;
     [[nodiscard]] bool IsDirectory() const;
     [[nodiscard]] const std::string& GetPath() const;
-    [[nodiscard]] size_t GetParentIndex() const;
+    [[nodiscard]] std::optional<size_t> GetParentIndex() const;
 
 private:
     Position position;
+    float sizeRadius = 16.f;
     bool isDirectory;
     std::string path;
-    size_t parentIndex  = static_cast<size_t>(-1);
+    std::optional<size_t> parentIndex  = std::nullopt;
 };

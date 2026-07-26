@@ -6,17 +6,16 @@ void GraphRenderer::DrawConnection(ImDrawList* bgDrawList, const Node& node1, co
     bgDrawList->AddLine(ImVec2(x1, y1), ImVec2(x2, y2), IM_COL32(130,200,210,150), 5.f);
 }
 
-void GraphRenderer::Render(const GraphLayout& layout) {
+void GraphRenderer::Render(const GraphLayout& layout) const {
     ImDrawList* bgDrawList = ImGui::GetBackgroundDrawList();
     const auto& allNodes = layout.GetNodes();
 
     for (const auto& node : allNodes) {
-        size_t parentIndex = node.GetParentIndex();
-        if (parentIndex < allNodes.size()) {
+        if (std::optional<size_t> parentIndex = node.GetParentIndex()) {
             auto [x, y] = node.GetPosition();
-            DrawConnection(bgDrawList, node, allNodes[parentIndex]);
+            DrawConnection(bgDrawList, node, allNodes[*parentIndex]);
             // debug
-            std::string parentIdxString = "P" + std::to_string(parentIndex);
+            std::string parentIdxString = "P" + std::to_string(*parentIndex);
             bgDrawList->AddText(
                 ImVec2(x-8.f, y-30.f),
                 IM_COL32(255,255,255,255),
@@ -31,7 +30,7 @@ void GraphRenderer::Render(const GraphLayout& layout) {
         const std::string& nodeText = node.GetPath();
         const ImU32 color = node.IsDirectory() ? IM_COL32(50,150,200,255) : IM_COL32(90,175,150,255);
 
-        bgDrawList->AddCircleFilled(ImVec2(x, y), 16.0f, color);
+        bgDrawList->AddCircleFilled(ImVec2(x, y), node.GetRadius(), color);
         bgDrawList->AddText(
             ImVec2(x-12.f, y+15.f),
             IM_COL32(255,255,255,255),
