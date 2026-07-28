@@ -1,19 +1,23 @@
 #include "Node.h"
 
-void Node::SetParent(const size_t index) {
-    parentIndex = index;
+void Node::SetParent(const size_t idx) {
+    parentIndex = idx;
 }
 
-bool Node::IsCursorInside(Position cursorPosition, float radius) const {
-    float dx = position.x - cursorPosition.x;
-    float dy = position.y - cursorPosition.y;
-    float distanceSquared = dx * dx + dy * dy;
+bool Node::IsCursorInside(const Position cursorPosition, const float radius) const {
+    const float dx = position.x - cursorPosition.x;
+    const float dy = position.y - cursorPosition.y;
+    const float distanceSquared = dx * dx + dy * dy;
 
     return distanceSquared <= radius * radius;
 }
 
 Position Node::GetPosition() const {
     return position;
+}
+
+size_t Node::GetIndex() const { // test
+    return index;
 }
 
 float Node::GetRadius() const {

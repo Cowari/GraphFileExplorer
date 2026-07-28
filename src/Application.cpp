@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "FileSystemScanner.h"
 
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
@@ -6,7 +7,7 @@
 
 #include <iostream>
 
-Application::Application(int width, int height, const char *title) :
+Application::Application(const int width, const int height, const char *title) :
 graphLayout(Position{500.f, 500.f})
 {
     if (!InitGLFW(width, height, title)) {
@@ -16,10 +17,7 @@ graphLayout(Position{500.f, 500.f})
     InitImGui();
 
     // testing/debug
-    graphLayout.AddNode({0.0f, 0.0f}, true, "home");
-    graphLayout.AddChildInOrbit(0, 60.f, -90.f, false, "text.txt");
-    graphLayout.AddChildInOrbit(0, 60.f, -10.f, true, "test_dir");
-    graphLayout.AddChildInOrbit(2, 60.f, -40.f, false, "test_file");
+    graphLayout.AddNode({0.0f, 0.0f}, true, "/home/cowari");
     graphLayout.PrintAllNodes();
 }
 
@@ -70,13 +68,16 @@ void Application::Shutdown() const {
     glfwTerminate();
 }
 
-void Application::HandleInput() const {
+void Application::HandleInput() {
     const ImVec2 mousePos = ImGui::GetMousePos();
 
     if (ImGui::IsMouseClicked(0)) {
-        if ( std::optional<size_t> clickedIndex = graphLayout.GetNodeIndexAtPosition({mousePos.x, mousePos.y}) ) {
+        if (const std::optional<size_t> clickedIndex = graphLayout.GetNodeIndexAtPosition({mousePos.x, mousePos.y}) ) {
             const auto& clickedNode = graphLayout.GetNodes()[*clickedIndex];
-            std::cout << "click on " << clickedNode.GetPath() << std::endl;
+            std::cout << "click on " << clickedNode.GetPath() << '['<<clickedNode.GetIndex()<<']'<< std::endl;
+            if (clickedNode.IsDirectory()) {
+                FileSystemScanner::BuildFromDirectory(clickedNode.GetPath(), graphLayout, clickedNode.GetIndex());
+            }
         }
         else {
             std::cout << "click on empty space" << std::endl;

@@ -39,6 +39,8 @@ add_executable(graphFE
         src/GraphRenderer.h
         src/Application.cpp
         src/Application.h
+        src/FileSystemScanner.cpp
+        src/FileSystemScanner.h
 )
 
 target_link_libraries(graphFE PRIVATE imgui)

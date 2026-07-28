@@ -9,13 +9,14 @@ struct Position {
 
 class Node {
 public:
-    Node(const Position position, const bool isDir, std::string path) :
-    position(position), isDirectory(isDir), path(std::move(path)) { }
+    Node(const size_t index,const Position position, const bool isDir, std::string path) :
+    index(index), position(position), isDirectory(isDir), path(std::move(path)) { }
 
-    void SetParent(size_t index);
+    void SetParent(size_t idx);
 
     [[nodiscard]] bool IsCursorInside(Position cursorPosition, float radius) const;
     [[nodiscard]] Position GetPosition() const;
+    [[nodiscard]] size_t GetIndex() const;
     [[nodiscard]] float GetRadius() const;
     [[nodiscard]] bool IsDirectory() const;
     [[nodiscard]] const std::string& GetPath() const;
@@ -26,5 +27,6 @@ private:
     float sizeRadius = 16.f;
     bool isDirectory;
     std::string path;
+    size_t index = 0;
     std::optional<size_t> parentIndex  = std::nullopt;
 };

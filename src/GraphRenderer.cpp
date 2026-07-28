@@ -25,7 +25,7 @@ void GraphRenderer::Render(const GraphLayout& layout) const {
         }
     }
 
-    for ( size_t i = 0; const auto& node : allNodes ) {
+    for ( const auto& node : allNodes ) {
         auto [x, y] = node.GetPosition();
         const std::string& nodeText = node.GetPath();
         const ImU32 color = node.IsDirectory() ? IM_COL32(50,150,200,255) : IM_COL32(90,175,150,255);
@@ -39,13 +39,12 @@ void GraphRenderer::Render(const GraphLayout& layout) const {
             );
 
         // debug
-        std::string indexStr = std::to_string(i);
+        std::string indexStr = std::to_string(node.GetIndex());
         bgDrawList->AddText(
             ImVec2(x-4.f, y-7.f),
             IM_COL32(50,50,50,255),
             indexStr.data(),
             indexStr.data() + indexStr.size()
             );
-        i++;
     }
 }

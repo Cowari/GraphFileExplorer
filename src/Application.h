@@ -17,7 +17,7 @@ class Application {
     void InitImGui() const;
     void Shutdown() const;
 
-    void HandleInput() const;
+    void HandleInput();
 
     GLFWwindow* window = nullptr;
 

@@ -7,8 +7,8 @@ class GraphLayout {
     public:
     explicit GraphLayout(const Position position) : pivotPos(position) { }
 
-    void AddNode(Position nodePosition, bool isDir, std::string nodeName);
-    void AddChildInOrbit(size_t parentIndex, float radius, float angleDeg, bool isDir, std::string nodeName);
+    void AddNode(Position nodePosition, bool isDir, std::string nodePath);
+    void AddChildInOrbit(size_t parentIndex, bool isDir, std::string nodePath);
 
     [[nodiscard]] const std::vector<Node>& GetNodes() const;
     [[nodiscard]] std::optional<size_t> GetNodeIndexAtPosition(Position posXY) const;
