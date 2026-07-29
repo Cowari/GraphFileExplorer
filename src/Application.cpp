@@ -50,7 +50,6 @@ bool Application::InitGLFW(const int width, const int height, const char *title)
 void Application::InitImGui() const {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    //const ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::StyleColorsDark();
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -68,15 +67,15 @@ void Application::Shutdown() const {
     glfwTerminate();
 }
 
-void Application::HandleInput() {
-    if (ImGui::GetIO().WantCaptureMouse) {
+void Application::HandleInput(const ImGuiIO& io) {
+    if (io.WantCaptureMouse) {
         return;
     }
 
-    const ImVec2 mousePos = ImGui::GetMousePos();
+    const Position mousePos = {ImGui::GetMousePos().x, ImGui::GetMousePos().y};
 
     if (ImGui::IsMouseClicked(0)) {
-        if (const std::optional<size_t> clickedIndex = graphLayout.GetNodeIndexAtPosition({mousePos.x, mousePos.y}) ) {
+        if (const std::optional<size_t> clickedIndex = graphLayout.GetNodeIndexAtPosition(camera.ScreenToWorld(mousePos)) ) {
             auto& clickedNode = graphLayout.GetNodes()[*clickedIndex];
             std::cout << "click on " << clickedNode.GetPath() << '['<<clickedNode.GetIndex()<<']'<< std::endl;
             if (clickedNode.IsDirectory() && !clickedNode.IsOpen()) {
@@ -88,9 +87,26 @@ void Application::HandleInput() {
             std::cout << "click on empty space" << std::endl;
         }
     }
+
+    constexpr float WHEEL_SENSITIVITY = 8.f;
+    const float wheelV = io.MouseWheel * WHEEL_SENSITIVITY;
+    const float wheelH = io.MouseWheelH * WHEEL_SENSITIVITY;
+    if (wheelV != 0.f) {
+        if (io.KeyShift) {
+            camera.MoveBy(-wheelV, 0.f);
+        } else {
+            camera.MoveBy(0.f, wheelV);
+        }
+    }
+    if (wheelH != 0.f) {
+        camera.MoveBy(wheelH, 0.f);
+    }
+
 }
 
 void Application::Run() {
+    const ImGuiIO& io = ImGui::GetIO();
+
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
@@ -99,9 +115,9 @@ void Application::Run() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        HandleInput();
+        HandleInput(io);
         // graph rendering
-        graphRenderer.Render(graphLayout);
+        graphRenderer.Render(graphLayout, camera);
 
         // End of ImGui frame, OpenGL rendering
         ImGui::Render();

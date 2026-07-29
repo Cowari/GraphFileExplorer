@@ -21,7 +21,7 @@ Position Node::GetPosition() const {
     return position;
 }
 
-size_t Node::GetIndex() const { // test
+size_t Node::GetIndex() const {
     return index;
 }
 

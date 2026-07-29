@@ -17,10 +17,11 @@ class Application {
     void InitImGui() const;
     void Shutdown() const;
 
-    void HandleInput();
+    void HandleInput(const ImGuiIO& io);
 
     GLFWwindow* window = nullptr;
 
     GraphLayout graphLayout;
     GraphRenderer graphRenderer;
+    Camera camera;
 };

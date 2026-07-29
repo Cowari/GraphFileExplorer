@@ -2,12 +2,11 @@
 #include <imgui.h>
 
 #include "GraphLayout.h"
+#include "Camera.h"
 
 class GraphRenderer {
 public:
-    void Render(const GraphLayout& layout) const;
+    void Render(const GraphLayout& layout, const Camera& camera) const;
 private:
-    // TODO:
-    // void drawConnection(Node1, Node2) - нарисует линию от одной ноды к другой
-    void DrawConnection(ImDrawList* bgDrawList, const Node& node1, const Node& node2) const;
+    void DrawConnection(ImDrawList* bgDrawList, Position nodePos1, Position nodePos2) const;
 };
