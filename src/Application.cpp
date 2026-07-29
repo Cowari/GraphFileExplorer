@@ -69,14 +69,19 @@ void Application::Shutdown() const {
 }
 
 void Application::HandleInput() {
+    if (ImGui::GetIO().WantCaptureMouse) {
+        return;
+    }
+
     const ImVec2 mousePos = ImGui::GetMousePos();
 
     if (ImGui::IsMouseClicked(0)) {
         if (const std::optional<size_t> clickedIndex = graphLayout.GetNodeIndexAtPosition({mousePos.x, mousePos.y}) ) {
-            const auto& clickedNode = graphLayout.GetNodes()[*clickedIndex];
+            auto& clickedNode = graphLayout.GetNodes()[*clickedIndex];
             std::cout << "click on " << clickedNode.GetPath() << '['<<clickedNode.GetIndex()<<']'<< std::endl;
-            if (clickedNode.IsDirectory()) {
-                FileSystemScanner::BuildFromDirectory(clickedNode.GetPath(), graphLayout, clickedNode.GetIndex());
+            if (clickedNode.IsDirectory() && !clickedNode.IsOpen()) {
+                FileSystemScanner::BuildFromDirectory(clickedNode.GetPath(), graphLayout, *clickedIndex);
+                graphLayout.SetOpened(*clickedIndex, true);
             }
         }
         else {

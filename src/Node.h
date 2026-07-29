@@ -13,12 +13,14 @@ public:
     index(index), position(position), isDirectory(isDir), path(std::move(path)) { }
 
     void SetParent(size_t idx);
+    void SetOpened(bool opened);
 
     [[nodiscard]] bool IsCursorInside(Position cursorPosition, float radius) const;
     [[nodiscard]] Position GetPosition() const;
     [[nodiscard]] size_t GetIndex() const;
     [[nodiscard]] float GetRadius() const;
     [[nodiscard]] bool IsDirectory() const;
+    [[nodiscard]] bool IsOpen() const;
     [[nodiscard]] const std::string& GetPath() const;
     [[nodiscard]] std::optional<size_t> GetParentIndex() const;
 
@@ -26,6 +28,7 @@ private:
     Position position;
     float sizeRadius = 16.f;
     bool isDirectory;
+    bool isOpen = false;
     std::string path;
     size_t index = 0;
     std::optional<size_t> parentIndex  = std::nullopt;

@@ -9,7 +9,9 @@ void FileSystemScanner::BuildFromDirectory(const fs::path& path, GraphLayout& la
     for (const fs::directory_entry& entry : fs::directory_iterator(path)) {
         if ( !IsHiddenUnix(entry) ) {
             const bool isDir = entry.is_directory();
-            layout.AddChildInOrbit(parentIdx, isDir, std::move(entry.path()));
+            if (!layout.IsNodeExists( entry.path()) ) {
+                layout.AddChildInOrbit(parentIdx, isDir, entry.path());
+            }
         }
     }
 }
