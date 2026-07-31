@@ -26,8 +26,21 @@ void GraphLayout::AddChildInOrbit(const size_t parentIndex, const bool isDir, st
     newNode.SetParent(parentIndex);
 }
 
+void GraphLayout::UpdateDescendantPaths(const std::string &oldPrefix, const std::string &newPrefix) {
+    for (size_t i = 0; i < allNodes.size(); ++i) {
+        const std::string& currentPath = allNodes[i].GetPath();
+        const bool startsWithPrefix = currentPath.starts_with(oldPrefix);
+        const bool isChild = startsWithPrefix && currentPath[oldPrefix.size()] == '/';
+        if (isChild) {
+            const std::string& tail = currentPath.substr(oldPrefix.size());
+            const std::string& newPath = newPrefix + tail;
+            SetNodePath(i, newPath);
+        }
+    }
+}
+
 void GraphLayout::SetNodeParent(const size_t nodeIndex, const size_t newParentIndex) {
-    if (nodeIndex >= allNodes.size()) return;
+    if (nodeIndex >= allNodes.size() || newParentIndex >= allNodes.size()) return;
     allNodes[nodeIndex].SetParent(newParentIndex);
 }
 
@@ -62,12 +75,7 @@ std::optional<size_t> GraphLayout::GetNodeIndexByPath(const std::string &path) c
 }
 
 bool GraphLayout::IsNodeExists(const std::string& nodePath) const {
-    for (const auto& node : allNodes) {
-        if (nodePath == node.GetPath()) {
-            return true;
-        }
-    }
-    return false;
+    return GetNodeIndexByPath(nodePath).has_value();
 }
 
 void GraphLayout::PrintAllNodes() const {

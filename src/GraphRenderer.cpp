@@ -14,7 +14,7 @@ void GraphRenderer::Render(const GraphLayout& layout, const Camera& camera) cons
         if (std::optional<size_t> parentIndex = node.GetParentIndex()) {
             const Position nodePos = node.GetPosition();
             auto [drawPosX, drawPosY] = camera.WorldToScreen(nodePos);
-            DrawConnection(bgDrawList, camera.WorldToScreen(nodePos), camera.WorldToScreen(allNodes[*parentIndex].GetPosition()));
+            DrawConnection(bgDrawList, Position{drawPosX, drawPosY}, camera.WorldToScreen(allNodes[*parentIndex].GetPosition()));
 
             // debug
             std::string parentIdxString = "P" + std::to_string(*parentIndex);
