@@ -13,6 +13,7 @@ public:
     index(index), position(position), isDirectory(isDir), path(std::move(path)) { }
 
     void SetParent(size_t idx);
+    void SetPath(std::string newPath);
     void SetOpened(bool opened);
 
     [[nodiscard]] bool IsCursorInside(Position cursorPosition, float radius) const;

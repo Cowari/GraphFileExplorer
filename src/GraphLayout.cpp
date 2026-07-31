@@ -26,6 +26,16 @@ void GraphLayout::AddChildInOrbit(const size_t parentIndex, const bool isDir, st
     newNode.SetParent(parentIndex);
 }
 
+void GraphLayout::SetNodeParent(const size_t nodeIndex, const size_t newParentIndex) {
+    if (nodeIndex >= allNodes.size()) return;
+    allNodes[nodeIndex].SetParent(newParentIndex);
+}
+
+void GraphLayout::SetNodePath(const size_t nodeIndex, const std::string &newPath) {
+    if (nodeIndex >= allNodes.size()) return;
+    allNodes[nodeIndex].SetPath(newPath);
+}
+
 void GraphLayout::SetOpened(const size_t idx, const bool open) {
     if (idx >= allNodes.size() || !allNodes[idx].IsDirectory()) return;
 
@@ -37,6 +47,15 @@ std::optional<size_t> GraphLayout::GetNodeIndexAtPosition(Position posXY) const{
         size_t idx = i - 1;
         if (allNodes[idx].IsCursorInside(posXY, allNodes[idx].GetRadius())) {
             return idx;
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<size_t> GraphLayout::GetNodeIndexByPath(const std::string &path) const {
+    for (size_t i = 0; i < allNodes.size(); ++i) {
+        if (allNodes[i].GetPath() == path) {
+            return i;
         }
     }
     return std::nullopt;

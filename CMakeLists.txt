@@ -43,6 +43,8 @@ add_executable(graphFE
         src/FileSystemScanner.h
         src/Camera.h
         src/Camera.cpp
+        src/FileOperations.cpp
+        src/FileOperations.h
 )
 
 target_link_libraries(graphFE PRIVATE imgui)

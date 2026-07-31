@@ -4,6 +4,10 @@ void Node::SetParent(const size_t idx) {
     parentIndex = idx;
 }
 
+void Node::SetPath(std::string newPath) {
+    path = std::move(newPath);
+}
+
 void Node::SetOpened(const bool opened) {
     if (isDirectory == false) return;
     isOpen = opened;
