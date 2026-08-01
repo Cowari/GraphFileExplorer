@@ -45,6 +45,8 @@ add_executable(graphFE
         src/Camera.cpp
         src/FileOperations.cpp
         src/FileOperations.h
+        src/WindowManager.cpp
+        src/WindowManager.h
 )
 
 target_link_libraries(graphFE PRIVATE imgui)

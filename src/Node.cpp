@@ -13,16 +13,27 @@ void Node::SetOpened(const bool opened) {
     isOpen = opened;
 }
 
+void Node::UpdatePosition(const Position parentWorldPos) {
+    worldPosition = Position{
+        parentWorldPos.x + localPosition.x,
+        parentWorldPos.y + localPosition.y
+    };
+}
+
 bool Node::IsCursorInside(const Position cursorPosition, const float radius) const {
-    const float dx = position.x - cursorPosition.x;
-    const float dy = position.y - cursorPosition.y;
+    const float dx = worldPosition.x - cursorPosition.x;
+    const float dy = worldPosition.y - cursorPosition.y;
     const float distanceSquared = dx * dx + dy * dy;
 
     return distanceSquared <= radius * radius;
 }
 
-Position Node::GetPosition() const {
-    return position;
+Position Node::GetWorldPosition() const {
+    return worldPosition;
+}
+
+Position Node::GetLocalPosition() const {
+    return localPosition;
 }
 
 size_t Node::GetIndex() const {

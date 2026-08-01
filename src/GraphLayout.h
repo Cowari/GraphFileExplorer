@@ -5,11 +5,14 @@
 
 class GraphLayout {
     public:
-    explicit GraphLayout(const Position position) : pivotPos(position) { }
+    GraphLayout() = default;
 
-    void AddNode(Position nodePosition, bool isDir, std::string nodePath);
+    void SetCenter(Position pos);
+
+    void AddMainNode(std::string nodePath);
     void AddChildInOrbit(size_t parentIndex, bool isDir, std::string nodePath);
     void UpdateDescendantPaths(const std::string& oldPrefix, const std::string& newPrefix);
+    void UpdateNodePositions();
     void SetNodeParent(size_t nodeIndex, size_t newParentIndex);
     void SetNodePath(size_t nodeIndex, const std::string &newPath);
     void SetOpened(size_t idx, bool open);
@@ -19,8 +22,9 @@ class GraphLayout {
     [[nodiscard]] std::optional<size_t> GetNodeIndexByPath(const std::string& path) const;
     [[nodiscard]] bool IsNodeExists(const std::string& nodePath) const;
     void PrintAllNodes() const; // for debug
+    void PrintNodeInfo(const Node& node) const;
 
     private:
     std::vector<Node> allNodes;
-    const Position pivotPos;
+    Position pivotPos {};
 };

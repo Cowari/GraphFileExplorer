@@ -7,28 +7,19 @@ void GraphRenderer::DrawConnection(ImDrawList* bgDrawList, const Position nodePo
 }
 
 void GraphRenderer::Render(const GraphLayout& layout, const Camera& camera) const {
-    ImDrawList* bgDrawList = ImGui::GetBackgroundDrawList();
+    ImDrawList* bgDrawList = ImGui::GetWindowDrawList();
     const auto& allNodes = layout.GetNodes();
 
     for (const auto& node : allNodes) {
         if (std::optional<size_t> parentIndex = node.GetParentIndex()) {
-            const Position nodePos = node.GetPosition();
+            const Position nodePos = node.GetWorldPosition();
             auto [drawPosX, drawPosY] = camera.WorldToScreen(nodePos);
-            DrawConnection(bgDrawList, Position{drawPosX, drawPosY}, camera.WorldToScreen(allNodes[*parentIndex].GetPosition()));
-
-            // debug
-            std::string parentIdxString = "P" + std::to_string(*parentIndex);
-            bgDrawList->AddText(
-                ImVec2(drawPosX-8.f, drawPosY-30.f),
-                IM_COL32(255,255,255,255),
-                parentIdxString.data(),
-                parentIdxString.data() + parentIdxString.size()
-                );
+            DrawConnection(bgDrawList, Position{drawPosX, drawPosY}, camera.WorldToScreen(allNodes[*parentIndex].GetWorldPosition()));
         }
     }
 
     for ( const auto& node : allNodes ) {
-        const Position nodePos = node.GetPosition();
+        const Position nodePos = node.GetWorldPosition();
         const std::string& nodeText = node.GetPath();
         const ImU32 color = node.IsDirectory() ? IM_COL32(50,150,200,255) : IM_COL32(90,175,150,255);
 

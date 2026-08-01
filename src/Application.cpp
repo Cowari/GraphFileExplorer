@@ -7,9 +7,7 @@
 
 #include <iostream>
 
-Application::Application(const int width, const int height, const char *title) :
-graphLayout(Position{500.f, 500.f})
-{
+Application::Application(const int width, const int height, const char *title) {
     if (!InitGLFW(width, height, title)) {
         std::exit(1);
     }
@@ -17,7 +15,7 @@ graphLayout(Position{500.f, 500.f})
     InitImGui();
 
     // testing/debug
-    graphLayout.AddNode({0.0f, 0.0f}, true, "/home/cowari");
+    graphLayout.AddMainNode("/home/cowari");
     graphLayout.PrintAllNodes();
 }
 
@@ -68,16 +66,12 @@ void Application::Shutdown() const {
 }
 
 void Application::HandleInput(const ImGuiIO& io) {
-    if (io.WantCaptureMouse) {
-        return;
-    }
-
     const Position mousePos = {ImGui::GetMousePos().x, ImGui::GetMousePos().y};
 
     if (ImGui::IsMouseClicked(0)) {
         if (const std::optional<size_t> clickedIndex = graphLayout.GetNodeIndexAtPosition(camera.ScreenToWorld(mousePos)) ) {
             auto& clickedNode = graphLayout.GetNodes()[*clickedIndex];
-            std::cout << "click on " << clickedNode.GetPath() << '['<<clickedNode.GetIndex()<<']'<< std::endl;
+            graphLayout.PrintNodeInfo(clickedNode);
             if (clickedNode.IsDirectory() && !clickedNode.IsOpen()) {
                 FileSystemScanner::BuildFromDirectory(clickedNode.GetPath(), graphLayout, *clickedIndex);
                 graphLayout.SetOpened(*clickedIndex, true);
@@ -117,7 +111,7 @@ void Application::Run() {
 
         HandleInput(io);
         // graph rendering
-        graphRenderer.Render(graphLayout, camera);
+        windowManager.DrawWindows(graphLayout, camera, io.DisplaySize);
 
         // End of ImGui frame, OpenGL rendering
         ImGui::Render();

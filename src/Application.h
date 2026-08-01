@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include "GraphLayout.h"
-#include "GraphRenderer.h"
+#include "WindowManager.h"
 
 class Application {
     public:
@@ -22,6 +22,6 @@ class Application {
     GLFWwindow* window = nullptr;
 
     GraphLayout graphLayout;
-    GraphRenderer graphRenderer;
+    WindowManager windowManager;
     Camera camera;
 };
