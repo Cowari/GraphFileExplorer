@@ -13,6 +13,7 @@ class GraphLayout {
     void AddChildInOrbit(size_t parentIndex, bool isDir, std::string nodePath);
     void UpdateDescendantPaths(const std::string& oldPrefix, const std::string& newPrefix);
     void UpdateNodePositions();
+    void UpdatePhysics(float deltaTime);
     void SetNodeParent(size_t nodeIndex, size_t newParentIndex);
     void SetNodePath(size_t nodeIndex, const std::string &newPath);
     void SetOpened(size_t idx, bool open);

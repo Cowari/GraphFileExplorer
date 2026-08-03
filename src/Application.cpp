@@ -97,7 +97,7 @@ void Application::HandleInput(const ImGuiIO& io) {
     }
 
 }
-
+int test = 1;
 void Application::Run() {
     const ImGuiIO& io = ImGui::GetIO();
 
@@ -110,6 +110,13 @@ void Application::Run() {
         ImGui::NewFrame();
 
         HandleInput(io);
+
+        if (ImGui::IsKeyPressed(ImGuiKey_N, false)) {
+            graphLayout.AddChildInOrbit(0, true, std::to_string(test));
+            test++;
+        }
+
+        graphLayout.UpdatePhysics(io.DeltaTime);
         // graph rendering
         windowManager.DrawWindows(graphLayout, camera, io.DisplaySize);
 

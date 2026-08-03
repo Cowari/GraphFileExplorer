@@ -8,6 +8,14 @@ void Node::SetPath(std::string newPath) {
     path = std::move(newPath);
 }
 
+void Node::SetVelocity(const Position v) {
+    velocity = v;
+}
+
+void Node::SetLocalPosition(const Position localPos) {
+    localPosition = localPos;
+}
+
 void Node::SetOpened(const bool opened) {
     if (isDirectory == false) return;
     isOpen = opened;
@@ -34,6 +42,15 @@ Position Node::GetWorldPosition() const {
 
 Position Node::GetLocalPosition() const {
     return localPosition;
+}
+
+std::string Node::GetName() const {
+    const size_t separatorIndex = path.find_last_of('/');
+    return (separatorIndex == std::string::npos) ? path : path.substr(separatorIndex+1) ;
+}
+
+Position Node::GetVelocity() const {
+    return velocity;
 }
 
 size_t Node::GetIndex() const {

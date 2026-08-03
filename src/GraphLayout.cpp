@@ -1,5 +1,6 @@
 #include "GraphLayout.h"
 
+#include <random>
 #include <cmath>
 #include <numbers>
 #include <iostream> //debug
@@ -14,15 +15,19 @@ void GraphLayout::AddMainNode(std::string nodePath) {
 }
 
 void GraphLayout::AddChildInOrbit(const size_t parentIndex, const bool isDir, std::string nodePath) {
+    constexpr float DEG_TO_RAD = std::numbers::pi_v<float> / 180.0f;
     if (parentIndex >= allNodes.size()) return;
 
-    constexpr float DEG_TO_RAD = std::numbers::pi_v<float> / 180.0f; //for optimize
-    const float radians = 16.f * DEG_TO_RAD; //hardcode angleDeg
+    static std::mt19937 rng{std::random_device{}()};
+    std::uniform_real_distribution<float> distribution{0.f, 360.f};
+    float angleDeg = distribution(rng);
+
+    const float radians = angleDeg * DEG_TO_RAD;
 
     const Position parentPos = allNodes[parentIndex].GetWorldPosition();
-    const Position newNodeLocalPos = {
-        60.f * std::cos(radians), // hardcode radius
-        60.f * std::sin(radians) // hardcode radius
+    const Position newNodeLocalPos = Position{
+        .x = 20.f * std::cos(radians),
+        .y = 20.f * std::sin(radians)
     };
     allNodes.emplace_back(parentIndex, parentPos, allNodes.size(), newNodeLocalPos, isDir, std::move(nodePath));
 }
@@ -52,6 +57,65 @@ void GraphLayout::UpdateNodePositions() {
 
         allNodes[i].UpdatePosition(parentWorldPos);
     }
+}
+
+void GraphLayout::UpdatePhysics(const float deltaTime) {
+    std::vector<Position> forces(allNodes.size(), Position{});
+
+    for (size_t i = 0; i < allNodes.size(); ++i) {
+        auto [x1, y1] = allNodes[i].GetWorldPosition();
+
+        for (size_t j = i + 1; j < allNodes.size(); ++j) {
+            auto [x2, y2] = allNodes[j].GetWorldPosition();
+            const float directX = x1 - x2, directY = y1 - y2;
+
+            const float distSquared = std::max(directX*directX + directY*directY, 1.f);
+            const float dist = std::sqrt(distSquared);
+
+            const float repulsion = 20000.f / distSquared;
+            // vector normalization
+            const float forceX = directX / dist * repulsion;
+            const float forceY = directY / dist * repulsion;
+            forces[i].x += forceX; forces[i].y += forceY;
+            forces[j].x -= forceX; forces[j].y -= forceY;
+        }
+    }
+
+    for (size_t i = 0; i < allNodes.size(); ++i) {
+        constexpr float restLength = 60.f;
+        constexpr float stiffness = 40.f;
+
+        if (auto parentIdx = allNodes[i].GetParentIndex()) {
+            auto [x1, y1] = allNodes[*parentIdx].GetWorldPosition();
+            auto [x2, y2] = allNodes[i].GetWorldPosition();
+            const float directX = x1 - x2, directY = y1 - y2;
+
+            const float dist = std::max(std::sqrt(directX*directX + directY*directY), 0.001f);
+            const float diff = dist - restLength;
+            const float forceX = (directX / dist) * diff * stiffness;
+            const float forceY = (directY / dist) * diff * stiffness;
+
+            forces[i].x += forceX;
+            forces[i].y += forceY;
+        }
+    }
+
+    for (size_t i = 0; i < allNodes.size(); ++i) {
+        constexpr float damping = 0.85f;
+        if (!allNodes[i].GetParentIndex()) continue;
+
+        Position velocity = allNodes[i].GetVelocity();
+        velocity.x = (velocity.x + forces[i].x * deltaTime) * damping;
+        velocity.y = (velocity.y + forces[i].y * deltaTime) * damping;
+        allNodes[i].SetVelocity(velocity);
+
+        Position local = allNodes[i].GetLocalPosition();
+        local.x += velocity.x * deltaTime;
+        local.y += velocity.y * deltaTime;
+        allNodes[i].SetLocalPosition(local);
+    }
+
+    UpdateNodePositions();
 }
 
 void GraphLayout::SetNodeParent(const size_t nodeIndex, const size_t newParentIndex) {

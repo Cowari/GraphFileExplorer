@@ -20,7 +20,7 @@ void GraphRenderer::Render(const GraphLayout& layout, const Camera& camera) cons
 
     for ( const auto& node : allNodes ) {
         const Position nodePos = node.GetWorldPosition();
-        const std::string& nodeText = node.GetPath();
+        const std::string& nodeText = node.GetName();
         const ImU32 color = node.IsDirectory() ? IM_COL32(50,150,200,255) : IM_COL32(90,175,150,255);
 
         auto [drawPosX, drawPosY] = camera.WorldToScreen(nodePos);
