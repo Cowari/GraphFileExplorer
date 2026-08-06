@@ -14,8 +14,9 @@ Application::Application(const int width, const int height, const char *title) {
 
     InitImGui();
 
-    // testing/debug
-    graphLayout.AddMainNode("/home/cowari");
+    const std::string home = std::getenv("HOME");
+    graphLayout.AddMainNode(home);
+    FileSystemScanner::BuildFromDirectory(home, graphLayout, 0);
     graphLayout.PrintAllNodes();
 }
 
@@ -66,19 +67,38 @@ void Application::Shutdown() const {
 }
 
 void Application::HandleInput(const ImGuiIO& io) {
-    const Position mousePos = {ImGui::GetMousePos().x, ImGui::GetMousePos().y};
+    if (!nodeNamePopup.IsOpen()) {
+        const auto mousePos = Position{ImGui::GetMousePos().x, ImGui::GetMousePos().y};
 
-    if (ImGui::IsMouseClicked(0)) {
-        if (const std::optional<size_t> clickedIndex = graphLayout.GetNodeIndexAtPosition(camera.ScreenToWorld(mousePos)) ) {
-            auto& clickedNode = graphLayout.GetNodes()[*clickedIndex];
-            graphLayout.PrintNodeInfo(clickedNode);
-            if (clickedNode.IsDirectory() && !clickedNode.IsOpen()) {
-                FileSystemScanner::BuildFromDirectory(clickedNode.GetPath(), graphLayout, *clickedIndex);
-                graphLayout.SetOpened(*clickedIndex, true);
+        if (ImGui::IsMouseClicked(0)) {
+            if (const std::optional<size_t> clickedIndex = graphLayout.GetNodeIndexAtPosition(camera.ScreenToWorld(mousePos)) ) {
+                auto& clickedNode = graphLayout.GetNodes()[*clickedIndex];
+                graphLayout.PrintNodeInfo(clickedNode);
+
+                graphLayout.SetSelectedNode(*clickedIndex);
+                if (clickedNode.IsDirectory() && !clickedNode.IsOpen()) {
+                    FileSystemScanner::BuildFromDirectory(clickedNode.GetPath(), graphLayout, *clickedIndex);
+                    graphLayout.SetOpened(*clickedIndex, true);
+                }
+            } else {
+                std::cout << "click on empty space" << std::endl;
             }
         }
-        else {
-            std::cout << "click on empty space" << std::endl;
+
+        if (const auto selectIdxOpt = graphLayout.GetSelectedNodeIndex()) {
+            const bool isDirectory = graphLayout.GetNodes()[*selectIdxOpt].IsDirectory();
+
+            if (ImGui::IsKeyPressed(ImGuiKey_N, false) && isDirectory) {
+                nodeNamePopup.Open(PopupMode::Create);
+            }
+            else if (ImGui::IsKeyPressed(ImGuiKey_F2, false)) {
+                const auto& selectedNode = graphLayout.GetNodes()[*graphLayout.GetSelectedNodeIndex()];
+                nodeNamePopup.Open(PopupMode::Rename, selectedNode.GetName());
+            }
+        }
+    } else {
+        if (ImGui::IsKeyPressed(ImGuiKey_Escape, false)) {
+            nodeNamePopup.Close();
         }
     }
 
@@ -97,7 +117,7 @@ void Application::HandleInput(const ImGuiIO& io) {
     }
 
 }
-int test = 1;
+
 void Application::Run() {
     const ImGuiIO& io = ImGui::GetIO();
 
@@ -111,14 +131,9 @@ void Application::Run() {
 
         HandleInput(io);
 
-        if (ImGui::IsKeyPressed(ImGuiKey_N, false)) {
-            graphLayout.AddChildInOrbit(0, true, std::to_string(test));
-            test++;
-        }
-
         graphLayout.UpdatePhysics(io.DeltaTime);
-        // graph rendering
-        windowManager.DrawWindows(graphLayout, camera, io.DisplaySize);
+
+        windowManager.DrawWindows(graphLayout, camera, nodeNamePopup, io.DisplaySize);
 
         // End of ImGui frame, OpenGL rendering
         ImGui::Render();

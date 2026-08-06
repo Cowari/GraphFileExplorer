@@ -128,6 +128,10 @@ void GraphLayout::SetNodePath(const size_t nodeIndex, const std::string &newPath
     allNodes[nodeIndex].SetPath(newPath);
 }
 
+void GraphLayout::SetSelectedNode(const size_t idx) {
+    selectedNodeIndex = idx;
+}
+
 void GraphLayout::SetOpened(const size_t idx, const bool open) {
     if (idx >= allNodes.size() || !allNodes[idx].IsDirectory()) return;
 
@@ -151,6 +155,10 @@ std::optional<size_t> GraphLayout::GetNodeIndexByPath(const std::string &path) c
         }
     }
     return std::nullopt;
+}
+
+std::optional<size_t> GraphLayout::GetSelectedNodeIndex() const {
+    return selectedNodeIndex;
 }
 
 bool GraphLayout::IsNodeExists(const std::string& nodePath) const {

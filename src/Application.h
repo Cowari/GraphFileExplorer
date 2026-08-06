@@ -3,6 +3,7 @@
 
 #include "GraphLayout.h"
 #include "WindowManager.h"
+#include "NodeNamePopup.h"
 
 class Application {
     public:
@@ -24,4 +25,5 @@ class Application {
     GraphLayout graphLayout;
     WindowManager windowManager;
     Camera camera;
+    NodeNamePopup nodeNamePopup;
 };

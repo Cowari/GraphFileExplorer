@@ -47,6 +47,8 @@ add_executable(graphFE
         src/FileOperations.h
         src/WindowManager.cpp
         src/WindowManager.h
+        src/NodeNamePopup.cpp
+        src/NodeNamePopup.h
 )
 
 target_link_libraries(graphFE PRIVATE imgui)

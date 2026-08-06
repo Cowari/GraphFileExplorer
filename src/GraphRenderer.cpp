@@ -7,14 +7,14 @@ void GraphRenderer::DrawConnection(ImDrawList* bgDrawList, const Position nodePo
 }
 
 void GraphRenderer::Render(const GraphLayout& layout, const Camera& camera) const {
-    ImDrawList* bgDrawList = ImGui::GetWindowDrawList();
+    ImDrawList* wDrawList = ImGui::GetWindowDrawList();
     const auto& allNodes = layout.GetNodes();
 
     for (const auto& node : allNodes) {
         if (std::optional<size_t> parentIndex = node.GetParentIndex()) {
             const Position nodePos = node.GetWorldPosition();
             auto [drawPosX, drawPosY] = camera.WorldToScreen(nodePos);
-            DrawConnection(bgDrawList, Position{drawPosX, drawPosY}, camera.WorldToScreen(allNodes[*parentIndex].GetWorldPosition()));
+            DrawConnection(wDrawList, Position{drawPosX, drawPosY}, camera.WorldToScreen(allNodes[*parentIndex].GetWorldPosition()));
         }
     }
 
@@ -24,8 +24,11 @@ void GraphRenderer::Render(const GraphLayout& layout, const Camera& camera) cons
         const ImU32 color = node.IsDirectory() ? IM_COL32(50,150,200,255) : IM_COL32(90,175,150,255);
 
         auto [drawPosX, drawPosY] = camera.WorldToScreen(nodePos);
-        bgDrawList->AddCircleFilled(ImVec2(drawPosX, drawPosY), node.GetRadius(), color);
-        bgDrawList->AddText(
+        wDrawList->AddCircleFilled(ImVec2(drawPosX, drawPosY), node.GetRadius(), color);
+        if (layout.GetSelectedNodeIndex() == node.GetIndex()) {
+            wDrawList->AddCircle(ImVec2(drawPosX, drawPosY), node.GetRadius()+3.f, IM_COL32(125, 195, 165, 255), 0, 3.f);
+        }
+        wDrawList->AddText(
             ImVec2(drawPosX-12.f, drawPosY+15.f),
             IM_COL32(255,255,255,255),
             nodeText.data(),
@@ -34,7 +37,7 @@ void GraphRenderer::Render(const GraphLayout& layout, const Camera& camera) cons
 
         // debug
         std::string indexStr = std::to_string(node.GetIndex());
-        bgDrawList->AddText(
+        wDrawList->AddText(
             ImVec2(drawPosX-4.f, drawPosY-7.f),
             IM_COL32(50,50,50,255),
             indexStr.data(),
