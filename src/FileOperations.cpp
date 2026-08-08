@@ -96,7 +96,7 @@ void FileOperations::CutFile(const fs::path &source, const fs::path &destination
     }
 }
 
-void FileOperations::Rename(const fs::path &path, const fs::path& newName, GraphLayout& layout) {
+void FileOperations::RenameFile(const fs::path &path, const fs::path& newName, GraphLayout& layout) {
     const fs::path& finalPath = GetAvailablePath(path.parent_path(), newName.filename(), fs::is_directory(path));
     std::error_code ec;
     fs::rename(path, finalPath, ec);
@@ -117,4 +117,19 @@ void FileOperations::Rename(const fs::path &path, const fs::path& newName, Graph
             std::cerr << "Renamed on disk, but no node found for path: " << path << std::endl;
         }
     }
+}
+
+void FileOperations::DeleteFile(const fs::path &path, GraphLayout &layout) {
+    std::error_code ec;
+
+    fs::remove_all(path, ec);
+
+    if (ec) {
+        std::cerr << "ERROR DELETE:\n" << ec.message() << std::endl;
+    } else {
+        if (const auto idx = layout.GetNodeIndexByPath(path)) {
+            layout.RemoveSubtree(*idx);
+        }
+    }
+
 }

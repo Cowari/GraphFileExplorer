@@ -90,7 +90,7 @@ void NodeNamePopup::Confirm(GraphLayout &layout) {
                 FileOperations::CreateFile(parentPath, childName, HasDirectoryPrefix(), layout);
                 break;
             case PopupMode::Rename:
-                FileOperations::Rename(parentPath, childName, layout);
+                FileOperations::RenameFile(parentPath, childName, layout);
                 break;
         }
     }

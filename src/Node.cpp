@@ -4,6 +4,10 @@ void Node::SetParent(const size_t idx) {
     parentIndex = idx;
 }
 
+void Node::SetIndex(const size_t idx) {
+    index = idx;
+}
+
 void Node::SetPath(std::string newPath) {
     path = std::move(newPath);
 }

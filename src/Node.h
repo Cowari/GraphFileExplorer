@@ -14,6 +14,7 @@ public:
     isDirectory(isDir), path(std::move(path)), index(index), parentIndex(parentIndex) { }
 
     void SetParent(size_t idx);
+    void SetIndex(size_t idx);
     void SetPath(std::string newPath);
     void SetVelocity(Position v);
     void SetLocalPosition(Position localPos);

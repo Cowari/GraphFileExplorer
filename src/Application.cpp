@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#include "FileOperations.h"
+
 Application::Application(const int width, const int height, const char *title) {
     if (!InitGLFW(width, height, title)) {
         std::exit(1);
@@ -17,7 +19,7 @@ Application::Application(const int width, const int height, const char *title) {
     const std::string home = std::getenv("HOME");
     graphLayout.AddMainNode(home);
     FileSystemScanner::BuildFromDirectory(home, graphLayout, 0);
-    graphLayout.PrintAllNodes();
+    //graphLayout.PrintAllNodes();
 }
 
 Application::~Application() {
@@ -77,7 +79,8 @@ void Application::HandleInput(const ImGuiIO& io) {
 
                 graphLayout.SetSelectedNode(*clickedIndex);
                 if (clickedNode.IsDirectory() && !clickedNode.IsOpen()) {
-                    FileSystemScanner::BuildFromDirectory(clickedNode.GetPath(), graphLayout, *clickedIndex);
+                    const std::string clickedNodePath = clickedNode.GetPath();
+                    FileSystemScanner::BuildFromDirectory(clickedNodePath, graphLayout, *clickedIndex);
                     graphLayout.SetOpened(*clickedIndex, true);
                 }
             } else {
@@ -86,14 +89,18 @@ void Application::HandleInput(const ImGuiIO& io) {
         }
 
         if (const auto selectIdxOpt = graphLayout.GetSelectedNodeIndex()) {
-            const bool isDirectory = graphLayout.GetNodes()[*selectIdxOpt].IsDirectory();
+            const Node& selectedNode = graphLayout.GetNodes()[*selectIdxOpt];
 
-            if (ImGui::IsKeyPressed(ImGuiKey_N, false) && isDirectory) {
+            if (ImGui::IsKeyPressed(ImGuiKey_N, false) && selectedNode.IsDirectory()) {
                 nodeNamePopup.Open(PopupMode::Create);
             }
             else if (ImGui::IsKeyPressed(ImGuiKey_F2, false)) {
-                const auto& selectedNode = graphLayout.GetNodes()[*graphLayout.GetSelectedNodeIndex()];
-                nodeNamePopup.Open(PopupMode::Rename, selectedNode.GetName());
+                const std::string selectedNodeName = selectedNode.GetName();
+                nodeNamePopup.Open(PopupMode::Rename, selectedNodeName);
+            }
+            else if (ImGui::IsKeyPressed(ImGuiKey_Delete, false)) {
+                const std::string selectedNodePath = selectedNode.GetPath();
+                FileOperations::DeleteFile(selectedNodePath, graphLayout);
             }
         }
     } else {

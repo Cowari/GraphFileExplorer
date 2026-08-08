@@ -4,6 +4,8 @@
 #include <cmath>
 #include <numbers>
 #include <iostream> //debug
+#include <unordered_map>
+#include <unordered_set>
 
 void GraphLayout::SetCenter(const Position pos) {
     pivotPos = pos;
@@ -30,6 +32,44 @@ void GraphLayout::AddChildInOrbit(const size_t parentIndex, const bool isDir, st
         .y = 20.f * std::sin(radians)
     };
     allNodes.emplace_back(parentIndex, parentPos, allNodes.size(), newNodeLocalPos, isDir, std::move(nodePath));
+}
+
+void GraphLayout::RemoveSubtree(const size_t rootIdx) {
+    selectedNodeIndex = std::nullopt;
+    std::unordered_set<size_t> toDelete{rootIdx};
+
+    for (size_t i = 0; i < allNodes.size(); ++i) {
+        if (const auto parentIdx = allNodes[i].GetParentIndex()) {
+            if (toDelete.contains(*parentIdx)) {
+                toDelete.insert(i);
+            }
+        }
+    }
+
+    std::vector<Node> newNodes = {};
+    newNodes.reserve(allNodes.size() - toDelete.size());
+
+    std::unordered_map<std::size_t, std::size_t> remap{}; // oldIndex -> newIndex
+
+    for (size_t i = 0; i < allNodes.size(); ++i) {
+        if (toDelete.contains(i)) continue;
+
+        remap[i] = remap.size();
+
+        newNodes.emplace_back(std::move(allNodes[i]));
+    }
+
+    for (size_t i = 0; i < newNodes.size(); ++i) {
+        const auto oldParentIdx = newNodes[i].GetParentIndex();
+
+        newNodes[i].SetIndex(i);
+        if (oldParentIdx) {
+            const size_t newParentIdx = remap.at(*oldParentIdx);
+            newNodes[i].SetParent(newParentIdx);
+        }
+    }
+
+    allNodes = std::move(newNodes);
 }
 
 void GraphLayout::UpdateDescendantPaths(const std::string &oldPrefix, const std::string &newPrefix) {

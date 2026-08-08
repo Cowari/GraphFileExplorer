@@ -11,6 +11,7 @@ class GraphLayout {
 
     void AddMainNode(std::string nodePath);
     void AddChildInOrbit(size_t parentIndex, bool isDir, std::string nodePath);
+    void RemoveSubtree(size_t rootIdx);
     void UpdateDescendantPaths(const std::string& oldPrefix, const std::string& newPrefix);
     void UpdateNodePositions();
     void UpdatePhysics(float deltaTime);
