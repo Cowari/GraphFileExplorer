@@ -4,6 +4,8 @@
 #include "GraphLayout.h"
 #include "WindowManager.h"
 #include "NodeNamePopup.h"
+#include "Commands.h"
+#include "KeyBindings.h"
 
 class Application {
     public:
@@ -26,4 +28,14 @@ class Application {
     WindowManager windowManager;
     Camera camera;
     NodeNamePopup nodeNamePopup;
+    Clipboard clipboard;
+
+    CreateNodeCommand createCmd;
+    RenameNodeCommand renameCmd;
+    CopyNodeCommand copyCmd;
+    CutNodeCommand cutCmd;
+    PasteNodeCommand pasteCmd;
+    DeleteNodeCommand deleteCmd;
+
+    std::vector<KeyBinding> bindings;
 };

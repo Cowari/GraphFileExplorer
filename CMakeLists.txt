@@ -49,6 +49,11 @@ add_executable(graphFE
         src/WindowManager.h
         src/NodeNamePopup.cpp
         src/NodeNamePopup.h
+        src/ICommand.h
+        src/Commands.cpp
+        src/Commands.h
+        src/Clipboard.h
+        src/KeyBindings.h
 )
 
 target_link_libraries(graphFE PRIVATE imgui)

@@ -9,7 +9,20 @@
 
 #include "FileOperations.h"
 
-Application::Application(const int width, const int height, const char *title) {
+Application::Application(const int width, const int height, const char *title)
+    : createCmd(nodeNamePopup, graphLayout), renameCmd(graphLayout, nodeNamePopup),
+      copyCmd(clipboard, graphLayout), cutCmd(clipboard, graphLayout),
+      pasteCmd(clipboard, graphLayout), deleteCmd(graphLayout) {
+
+    bindings = {
+        {ImGuiKey_N, false, &createCmd},
+        {ImGuiKey_F2, false, &renameCmd},
+        {ImGuiKey_Delete, false, &deleteCmd},
+        {ImGuiKey_C, true, &copyCmd},
+        {ImGuiKey_X, true, &cutCmd},
+        {ImGuiKey_V, true, &pasteCmd},
+    };
+
     if (!InitGLFW(width, height, title)) {
         std::exit(1);
     }
@@ -88,19 +101,10 @@ void Application::HandleInput(const ImGuiIO& io) {
             }
         }
 
-        if (const auto selectIdxOpt = graphLayout.GetSelectedNodeIndex()) {
-            const Node& selectedNode = graphLayout.GetNodes()[*selectIdxOpt];
-
-            if (ImGui::IsKeyPressed(ImGuiKey_N, false) && selectedNode.IsDirectory()) {
-                nodeNamePopup.Open(PopupMode::Create);
-            }
-            else if (ImGui::IsKeyPressed(ImGuiKey_F2, false)) {
-                const std::string selectedNodeName = selectedNode.GetName();
-                nodeNamePopup.Open(PopupMode::Rename, selectedNodeName);
-            }
-            else if (ImGui::IsKeyPressed(ImGuiKey_Delete, false)) {
-                const std::string selectedNodePath = selectedNode.GetPath();
-                FileOperations::DeleteFile(selectedNodePath, graphLayout);
+        for (const auto& binding : bindings) {
+            if (io.KeyCtrl == binding.requiresCtrl && ImGui::IsKeyPressed(binding.key, false)) {
+                binding.command->Execute();
+                break;
             }
         }
     } else {
